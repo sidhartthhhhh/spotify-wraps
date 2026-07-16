@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block content %}
+<main class="container py-5 text-center">
+  <div class="hero mx-auto">
+    <p class="eyebrow">MY LISTENING, IN FOCUS</p>
+    <h1 class="display-2 fw-bold">The rhythm behind my music.</h1>
+    <p class="lead text-secondary">My Spotify analytics, monthly recaps, and year-in-music story.</p>
+    {% if user.is_authenticated %}
+      {% if user.spotify_account %}<a class="btn btn-primary btn-lg" href="/dashboard/">Open my dashboard</a>
+      {% elif spotify_configured %}<a class="btn btn-primary btn-lg" href="/spotify/login/">Connect my Spotify</a>
+      {% else %}<div class="alert alert-warning text-start mt-4">
+        I haven't configured Spotify yet. I need to add <code>SPOTIFY_CLIENT_ID</code>
+        and <code>SPOTIFY_CLIENT_SECRET</code> to <code>.env</code>, then restart the server.
+      </div>{% endif %}
+    {% else %}<a class="btn btn-primary btn-lg" href="/admin/login/?next=/">Sign in to begin</a>{% endif %}
+  </div>
+</main>
+{% endblock %}

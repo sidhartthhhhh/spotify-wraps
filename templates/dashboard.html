@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% block title %}Dashboard · SoundScope{% endblock %}
+{% block content %}
+<main class="container py-4">
+  <div class="page-head">
+    <div><p class="eyebrow mb-1">MY LIBRARY</p><h1>Hey, {{ account.display_name }}.</h1><p class="muted">Here's what I've been playing.</p></div>
+    <a class="btn btn-primary rounded-pill px-4" href="/dashboard/wrapped/">Open my Wrapped</a>
+  </div>
+  <div class="row g-3 mb-4">
+    <div class="col-6 col-lg-3"><div class="metric"><span>Estimated minutes</span><strong>{{ analytics.estimated_minutes }}</strong></div></div>
+    <div class="col-6 col-lg-3"><div class="metric"><span>Listening events</span><strong>{{ analytics.total_events }}</strong></div></div>
+    <div class="col-6 col-lg-3"><div class="metric"><span>Unique tracks</span><strong>{{ analytics.unique_tracks }}</strong></div></div>
+    <div class="col-6 col-lg-3"><div class="metric"><span>Unique artists</span><strong>{{ analytics.unique_artists }}</strong></div></div>
+  </div>
+  <div class="row g-4">
+    <section class="col-lg-8"><div class="panel"><div class="panel-title"><h2>Listening trend</h2><span>plays by month</span></div><canvas id="monthly"></canvas></div></section>
+    <section class="col-lg-4"><div class="panel h-100 pattern"><span class="muted">My listening type</span><p class="display-6">{{ analytics.personality }}</p><div><b>{{ analytics.most_active_hour.hour|default:"—" }}:00</b><small>my peak hour</small></div><div><b>{{ analytics.weekend_percent }}%</b><small>on my weekends</small></div><div><b>{{ analytics.longest_streak }}</b><small>day streak</small></div></div></section>
+    <section class="col-lg-6"><div class="panel"><div class="panel-title"><h2>Top tracks</h2><a href="/dashboard/top-tracks/">View all</a></div><div class="media-list">{% for item in top_tracks|slice:":5" %}<div class="media-row"><span class="rank">{{ item.rank }}</span>{% if item.track.album.image_url %}<img src="{{ item.track.album.image_url }}" alt="" loading="lazy">{% endif %}<div><b>{{ item.track.name }}</b><small>{% for artist in item.track.artists.all %}{{ artist.name }}{% if not forloop.last %}, {% endif %}{% endfor %}</small></div></div>{% empty %}<p class="muted">Sync data to begin.</p>{% endfor %}</div></div></section>
+    <section class="col-lg-6"><div class="panel"><div class="panel-title"><h2>Top artists</h2><a href="/dashboard/top-artists/">View all</a></div><div class="artist-grid">{% for item in top_artists|slice:":5" %}<div>{% if item.artist.image_url %}<img src="{{ item.artist.image_url }}" alt="{{ item.artist.name }}" loading="lazy">{% endif %}<b>{{ item.artist.name }}</b></div>{% empty %}<p class="muted">Sync data to begin.</p>{% endfor %}</div></div></section>
+    <section class="col-12"><div class="panel"><h2>Time-of-day distribution</h2><canvas id="hourly"></canvas></div></section>
+  </div>
+</main>
+{{ analytics.monthly|json_script:"monthly-data" }}{{ analytics.hourly|json_script:"hourly-data" }}
+{% endblock %}
+{% block scripts %}<script>
+const monthly=JSON.parse(document.getElementById("monthly-data").textContent);
+new Chart(document.getElementById("monthly"),{type:"line",data:{labels:monthly.map(x=>x.label),datasets:[{data:monthly.map(x=>x.count),borderColor:"#9b5cff",backgroundColor:"#9b5cff44",fill:true,tension:.35}]},options:{plugins:{legend:{display:false}}}});
+const hourly=JSON.parse(document.getElementById("hourly-data").textContent), map=Object.fromEntries(hourly.map(x=>[x.hour,x.count]));
+new Chart(document.getElementById("hourly"),{type:"bar",data:{labels:[...Array(24).keys()].map(x=>x+":00"),datasets:[{data:[...Array(24).keys()].map(x=>map[x]||0),backgroundColor:"#34d399"}]},options:{plugins:{legend:{display:false}}}});
+</script>{% endblock %}

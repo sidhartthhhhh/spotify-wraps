@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% block content %}<main class="container py-5"><p class="eyebrow">MY MUSIC</p><h1>{{ title }}</h1><div class="panel mt-4"><div class="media-list">
+{% for item in objects %}<div class="media-row">
+  {% if kind == "top-tracks" %}<span class="rank">{{ item.rank }}</span>{% if item.track.album.image_url %}<img src="{{ item.track.album.image_url }}" alt="" loading="lazy">{% endif %}<div><b>{{ item.track.name }}</b><small>{{ item.time_range }}</small></div>
+  {% elif kind == "top-artists" %}{% if item.artist.image_url %}<img class="round" src="{{ item.artist.image_url }}" alt="" loading="lazy">{% endif %}<div><b>{{ item.artist.name }}</b><small>#{{ item.rank }} · {{ item.time_range }}</small></div>
+  {% elif kind == "recently-played" %}{% if item.track.album.image_url %}<img src="{{ item.track.album.image_url }}" alt="" loading="lazy">{% endif %}<div><b>{{ item.track.name }}</b><small>{{ item.played_at }}</small></div>
+  {% elif kind == "saved-tracks" %}{% if item.track.album.image_url %}<img src="{{ item.track.album.image_url }}" alt="" loading="lazy">{% endif %}<div><b>{{ item.track.name }}</b><small>{{ item.added_at }}</small></div>
+  {% else %}{% if item.image_url %}<img src="{{ item.image_url }}" alt="" loading="lazy">{% endif %}<div><b>{{ item.name }}</b><small>{{ item.total_tracks }} tracks</small></div>{% endif %}
+</div>{% empty %}<p>No synchronized data yet.</p>{% endfor %}
+</div></div></main>{% endblock %}

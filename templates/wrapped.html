@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block title %}My music story · SoundScope{% endblock %}
+{% block content %}
+<main class="wrapped">
+  <section><p class="eyebrow">MY {{ period|upper }} STORY</p><h1>My year had a soundtrack.</h1></section>
+  <section class="violet"><p>Estimated listening time</p><h2>{{ analytics.estimated_minutes }}</h2><p>minutes reconstructed from stored plays</p></section>
+  <section class="green"><p>Songs played</p><h2>{{ analytics.total_events }}</h2><p>{{ analytics.unique_tracks }} unique tracks</p></section>
+  <section>{% if analytics.most_played_artist.track__artists__image_url %}<img class="wrapped-art" src="{{ analytics.most_played_artist.track__artists__image_url }}" alt="">{% endif %}<p>My top artist</p><h2>{{ analytics.most_played_artist.track__artists__name|default:"Waiting for more plays" }}</h2></section>
+  <section class="orange">{% if analytics.most_played_track.track__album__image_url %}<img class="wrapped-art" src="{{ analytics.most_played_track.track__album__image_url }}" alt="">{% endif %}<p>My top track</p><h2>{{ analytics.most_played_track.track__name|default:"Waiting for more plays" }}</h2></section>
+  <section><p>I'm a</p><h2>{{ analytics.personality }}</h2><p>{{ analytics.weekend_percent }}% of my listening happened on weekends · {{ analytics.night_percent }}% late at night</p></section>
+  <section class="final"><p>My longest listening streak</p><h2>{{ analytics.longest_streak }} days</h2>
+    {% if not public %}<div class="d-flex gap-2">
+      <form method="post" action="/dashboard/wrapped/share/">{% csrf_token %}<button class="btn btn-light">Share my story</button></form>
+      <form method="post" action="/dashboard/wrapped/share/disable/">{% csrf_token %}<button class="btn btn-outline-light">Stop sharing</button></form>
+    </div>{% endif %}
+  </section>
+</main>
+{% endblock %}
